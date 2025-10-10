@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>문구 이미지 메이커 - Imagen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&family=Gamja+Flower&family=Dokdo&family=Sunflower:wght@500&family=Single+Day&family=Nanum+Pen+Script&family=Poor+Story&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Jua', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 8px;
+            font-family: 'Black Han Sans', sans-serif;
+        }
+
+        .tagline {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #333;
+            font-family: 'Black Han Sans', sans-serif;
+        }
+
+        .text-input {
+            width: 100%;
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 18px;
+            font-family: 'Jua', sans-serif;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .font-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .font-btn {
+            background: #f8f8f8;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 16px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .font-btn:active {
+            transform: scale(0.96);
+        }
+
+        .font-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        .color-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .color-btn:active {
+            transform: scale(0.9);
+        }
+
+        .color-btn.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .size-slider {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .size-value {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        #preview {
+            width: 100%;
+            border-radius: 0;
+            display: block;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Jua', sans-serif;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        .action-btn.full {
+            grid-column: 1 / -1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #f0f0f0;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            border: none;
+        }
+
+        .templates {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .template-btn {
+            background: #f8f8f8;
+            border: 2px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .template-btn:active {
+            transform: scale(0.96);
+        }
+
+        .emoji {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">✨ 문구 이미지 메이커</div>
+            <div class="tagline">당신의 문구를 예쁜 이미지로 만들어보세요</div>
+        </div>
+
+        <!-- Text Input -->
+        <div class="card">
+            <div class="section-title">💬 문구 입력</div>
+            <textarea class="text-input" id="textInput" placeholder="여기에 문구를 입력하세요...&#10;&#10;예: 오늘도 화이팅!"></textarea>
+        </div>
+
+        <!-- Quick Templates -->
+        <div class="card">
+            <div class="section-title">🎨 빠른 템플릿</div>
+            <div class="templates">
+                <button class="template-btn" onclick="useTemplate('오늘도\n화이팅!')">
+                    <span class="emoji">💪</span>
+                    오늘도 화이팅!
+                </button>
+                <button class="template-btn" onclick="useTemplate('감사합니다\n♡')">
+                    <span class="emoji">🙏</span>
+                    감사합니다
+                </button>
+                <button class="template-btn" onclick="useTemplate('행복한\n하루 되세요')">
+                    <span class="emoji">😊</span>
+                    행복한 하루
+                </button>
+                <button class="template-btn" onclick="useTemplate('사랑해요\n❤️')">
+                    <span class="emoji">❤️</span>
+                    사랑해요
+                </button>
+            </div>
+        </div>
+
+        <!-- Font Selection -->
+        <div class="card">
+            <div class="section-title">📝 폰트 선택</div>
+            <div class="font-grid">
+                <button class="font-btn selected" style="font-family: 'Black Han Sans', sans-serif;" onclick="selectFont(this, 'Black Han Sans')">검은고딕</button>
+                <button class="font-btn" style="font-family: 'Jua', sans-serif;" onclick="selectFont(this, 'Jua')">주아체</button>
+                <button class="font-btn" style="font-family: 'Gamja Flower', cursive;" onclick="selectFont(this, 'Gamja Flower')">감자꽃</button>
+                <button class="font-btn" style="font-family: 'Dokdo', cursive;" onclick="selectFont(this, 'Dokdo')">독도체</button>
+                <button class="font-btn" style="font-family: 'Sunflower', sans-serif;" onclick="selectFont(this, 'Sunflower')">해바라기</button>
+                <button class="font-btn" style="font-family: 'Single Day', cursive;" onclick="selectFont(this, 'Single Day')">싱글데이</button>
+                <button class="font-btn" style="font-family: 'Nanum Pen Script', cursive;" onclick="selectFont(this, 'Nanum Pen Script')">나눔손글씨</button>
+                <button class="font-btn" style="font-family: 'Poor Story', cursive;" onclick="selectFont(this, 'Poor Story')">가난한이야기</button>
+            </div>
+        </div>
+
+        <!-- Text Size -->
+        <div class="card">
+            <div class="section-title">📏 글자 크기</div>
+            <div class="size-value" id="sizeValue">60px</div>
+            <input type="range" class="size-slider" id="sizeSlider" min="30" max="120" value="60" oninput="updateSize(this.value)">
+        </div>
+
+        <!-- Background Color -->
+        <div class="card">
+            <div class="section-title">🎨 배경 색상</div>
+            <div class="color-grid">
+                <button class="color-btn selected" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)')"></button>
+                <button class="color-btn" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);" onclick="selectBg(this, 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)')"></button>
+                <button class="color-btn" style="background: #000000;" onclick="selectBg(this, '#000000')"></button>
+            </div>
+        </div>
+
+        <!-- Text Color -->
+        <div class="card">
+            <div class="section-title">✏️ 글자 색상</div>
+            <div class="color-grid">
+                <button class="color-btn selected" style="background: #FFFFFF; border: 2px solid #e0e0e0;" onclick="selectTextColor(this, '#FFFFFF')"></button>
+                <button class="color-btn" style="background: #000000;" onclick="selectTextColor(this, '#000000')"></button>
+                <button class="color-btn" style="background: #FF6B6B;" onclick="selectTextColor(this, '#FF6B6B')"></button>
+                <button class="color-btn" style="background: #4ECDC4;" onclick="selectTextColor(this, '#4ECDC4')"></button>
+                <button class="color-btn" style="background: #FFE66D;" onclick="selectTextColor(this, '#FFE66D')"></button>
+                <button class="color-btn" style="background: #95E1D3;" onclick="selectTextColor(this, '#95E1D3')"></button>
+                <button class="color-btn" style="background: #F38181;" onclick="selectTextColor(this, '#F38181')"></button>
+                <button class="color-btn" style="background: #AA96DA;" onclick="selectTextColor(this, '#AA96DA')"></button>
+                <button class="color-btn" style="background: #FCBAD3;" onclick="selectTextColor(this, '#FCBAD3')"></button>
+                <button class="color-btn" style="background: #A8E6CF;" onclick="selectTextColor(this, '#A8E6CF')"></button>
+            </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-card">
+            <canvas id="preview" width="1080" height="1080"></canvas>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="action-grid">
+                <button class="action-btn" onclick="downloadImage()">
+                    <span>📥</span>
+                    <span>저장</span>
+                </button>
+                <button class="action-btn" onclick="shareImage()">
+                    <span>📤</span>
+                    <span>공유</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <canvas id="exportCanvas" width="1080" height="1080"></canvas>
+
+    <script>
+        let currentFont = 'Black Han Sans';
+        let currentBg = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        let currentTextColor = '#FFFFFF';
+        let currentSize = 60;
+
+        const preview = document.getElementById('preview');
+        const ctx = preview.getContext('2d');
+        const textInput = document.getElementById('textInput');
+
+        // Initial render
+        renderPreview();
+
+        // Auto-update on text input
+        textInput.addEventListener('input', renderPreview);
+
+        function renderPreview() {
+            const canvas = preview;
+            const ctx = canvas.getContext('2d');
+            const text = textInput.value || '여기에 문구를 입력하세요';
+
+            // Clear
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Background
+            if (currentBg.startsWith('linear-gradient')) {
+                // Parse gradient
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+
+                // Extract colors from gradient string
+                const matches = currentBg.match(/#[0-9a-fA-F]{6}/g);
+                if (matches && matches.length >= 2) {
+                    gradient.addColorStop(0, matches[0]);
+                    gradient.addColorStop(1, matches[1]);
+                }
+                ctx.fillStyle = gradient;
+            } else {
+                ctx.fillStyle = currentBg;
+            }
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Text
+            ctx.fillStyle = currentTextColor;
+            ctx.font = `${currentSize * 1.5}px '${currentFont}'`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Add text shadow for better readability
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 4;
+
+            // Multi-line support
+            const lines = text.split('\n');
+            const lineHeight = currentSize * 1.8;
+            const totalHeight = lines.length * lineHeight;
+            const startY = (canvas.height - totalHeight) / 2 + lineHeight / 2;
+
+            lines.forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
+            });
+        }
+
+        function selectFont(btn, font) {
+            document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            currentFont = font;
+            renderPreview();
+        }
+
+        function selectBg(btn, bg) {
+            document.querySelectorAll('.color-grid')[0].querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            currentBg = bg;
+            renderPreview();
+        }
+
+        function selectTextColor(btn, color) {
+            document.querySelectorAll('.color-grid')[1].querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            currentTextColor = color;
+            renderPreview();
+        }
+
+        function updateSize(value) {
+            currentSize = parseInt(value);
+            document.getElementById('sizeValue').textContent = value + 'px';
+            renderPreview();
+        }
+
+        function useTemplate(text) {
+            textInput.value = text;
+            renderPreview();
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = `imagen-${Date.now()}.png`;
+            link.href = preview.toDataURL('image/png');
+            link.click();
+
+            showToast('📥 이미지가 저장되었습니다!');
+        }
+
+        async function shareImage() {
+            try {
+                const blob = await new Promise(resolve => {
+                    preview.toBlob(resolve, 'image/png');
+                });
+
+                if (navigator.share && navigator.canShare({ files: [new File([blob], 'imagen.png', { type: 'image/png' })] })) {
+                    const file = new File([blob], 'imagen.png', { type: 'image/png' });
+                    await navigator.share({
+                        title: '문구 이미지',
+                        text: textInput.value,
+                        files: [file]
+                    });
+                } else {
+                    // Fallback to download
+                    downloadImage();
+                    showToast('📤 이미지를 저장했습니다. 갤러리에서 공유해주세요!');
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    downloadImage();
+                    showToast('📤 이미지를 저장했습니다!');
+                }
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Initial render
+        setTimeout(renderPreview, 100);
+    </script>
+</body>
+</html>
